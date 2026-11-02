@@ -3,9 +3,10 @@ import streamlit as st
 from langchain_groq import ChatGroq
 import os
 
+# streamlit app deployed to url: https://app-chatbot-v1.streamlit.app/
+
 # load the env variables
 load_dotenv()
-print("API Key loaded:", os.getenv("GROQ_API_KEY"))
 
 # streamlit page setup
 st.set_page_config(
@@ -14,6 +15,13 @@ st.set_page_config(
     layout="centered",
 )
 st.title("💬 Generative AI Chatbot")
+
+llm_option = st.selectbox(
+    "Which LLM provider would you like to use?",
+    ("groq", "gemini", "openai")
+)
+
+st.write("You selected:", llm_option)
 
 # initiate chat history
 if "chat_history" not in st.session_state:
@@ -25,10 +33,8 @@ for message in st.session_state.chat_history:
         st.markdown(message["content"])
 
 # llm initiate
-llm = ChatGroq(
-    model="openai/gpt-oss-20b",
-    temperature=0.0,
-)
+from get_llm import get_langchain_llm
+llm = get_langchain_llm(llm_option)
 
 # input box
 user_prompt = st.chat_input("Ask Chatbot...")
